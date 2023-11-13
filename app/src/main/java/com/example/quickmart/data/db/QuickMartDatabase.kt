@@ -5,8 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.quickmart.data.db.entities.CartEntity
+import com.example.quickmart.data.db.entities.FavouriteEntity
 
-@Database(entities = [CartEntity::class], version = 1)
+@Database(entities = [CartEntity::class, FavouriteEntity::class], version = 1)
 abstract class QuickMartDatabase : RoomDatabase() {
     abstract fun getQuickMartDao(): QuickMartDao
 

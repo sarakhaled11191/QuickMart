@@ -1,7 +1,6 @@
 package com.example.quickmart.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,30 +27,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.quickmart.data.db.QuickMartDatabase
-import com.example.quickmart.data.repository.CartRepository
-import com.example.quickmart.models.CartItem
+import com.example.quickmart.models.FavouriteItem
 import com.example.quickmart.ui.theme.H1Color
-import kotlinx.coroutines.launch
 
 @Composable
-fun CartItemUi(
-    cartItem: CartItem,
-    onDeleteIconClicked: (CartItem) -> Unit,
-    onPriceChange: (Double) -> Unit
+fun FavouriteItemUi(
+    favouriteItem: FavouriteItem,
+    onDeleteIconClicked: (FavouriteItem) -> Unit,
 ) {
-    val dataBase = QuickMartDatabase(LocalContext.current)
-    val repository = CartRepository
-    repository.initDb(dataBase)
-    val coroutineScope = rememberCoroutineScope()
-    var previousTotalPrice = 0.0
-    var totalPrice by remember { mutableDoubleStateOf(cartItem.calculateTotalPrice()) }
     val resources = LocalContext.current.resources
     val packageName = LocalContext.current.packageName
-    val imageResId = resources.getIdentifier(cartItem.productImage, "drawable", packageName)
+    val imageResId = resources.getIdentifier(favouriteItem.productImage, "drawable", packageName)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,7 +75,7 @@ fun CartItemUi(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = cartItem.productName,
+                                text = favouriteItem.productName,
                                 color = H1Color,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
@@ -99,56 +86,17 @@ fun CartItemUi(
                             contentDescription = "delete item",
                             tint = Color.Gray.copy(0.7f),
                             modifier = Modifier.clickable {
-                                onDeleteIconClicked(cartItem)
+                                onDeleteIconClicked(favouriteItem)
                             }
                         )
                     }
                     Spacer(modifier = Modifier.height(25.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        CounterView(
-                            modifier = Modifier, quantityP = cartItem.quantity,
-                            onPlusButtonClicked = {
-                                val previousPrice = cartItem.calculateTotalPrice()
-                                cartItem.quantity += 1
-                                coroutineScope.launch {
-                                    repository.updateItem(
-                                        cartItem.productId,
-                                        cartItem.quantity
-                                    )
-                                }
-                                totalPrice = cartItem.calculateTotalPrice()
-                                val newPrice = cartItem.calculateTotalPrice()
-                                val priceDifference = newPrice - previousPrice
-                                onPriceChange(priceDifference)
-                                previousTotalPrice = newPrice
-                            },
-                            onMiensButtonClicked = {
-                                val previousPrice = cartItem.calculateTotalPrice()
-                                cartItem.quantity -= 1
-                                coroutineScope.launch {
-                                    repository.updateItem(
-                                        cartItem.productId,
-                                        cartItem.quantity
-                                    )
-                                }
-                                totalPrice = cartItem.calculateTotalPrice()
-                                val newPrice = cartItem.calculateTotalPrice()
-                                val priceDifference = newPrice - previousPrice
-                                onPriceChange(priceDifference)
-                                previousTotalPrice = newPrice
-                            }
-                        )
-                        Text(
-                            text = "$${String.format("%.2f", totalPrice)}",
-                            color = H1Color,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
+                    Text(
+                        text = "$${String.format("%.2f", favouriteItem.unitPrice)}",
+                        color = H1Color,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

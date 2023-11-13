@@ -29,11 +29,11 @@ import com.example.quickmart.utils.withClickable
 @Composable
 fun CounterView(
     modifier: Modifier,
-    cartItem: CartItem,
+    quantityP: Int,
     onPlusButtonClicked: () -> Unit,
     onMiensButtonClicked: () -> Unit,
 ) {
-    var quantity by remember { mutableIntStateOf(cartItem.quantity) }
+    var quantity by remember { mutableIntStateOf(quantityP) }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,

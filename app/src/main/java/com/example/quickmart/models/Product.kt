@@ -9,5 +9,6 @@ data class Product(
     val description: String,
     val price: Double,
     val rating: Int,
-    val imageName: String
+    val imageName: String,
+    var isInFavourites : Boolean = false
 ) : Serializable

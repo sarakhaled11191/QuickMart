@@ -4,7 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,14 +23,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.quickmart.models.Product
-import com.example.quickmart.ui.theme.GrayColor
 import com.example.quickmart.ui.theme.GreenColor
 import com.example.quickmart.ui.theme.H1Color
 
 @Composable
 fun ProductItem(
     product: Product,
-    onAddClick: (Product) -> Unit
+    onAddClick: (Product) -> Unit,
+    onItemClick: (Product) -> Unit,
 ) {
     val resources = LocalContext.current.resources
     val packageName = LocalContext.current.packageName
@@ -38,8 +41,14 @@ fun ProductItem(
             .size(340.dp)
             .border(1.dp, Color.Gray.copy(0.2f), shape = RoundedCornerShape(15.dp))
             .padding(15.dp)
+            .clickable(
+                indication = null,
+                interactionSource = MutableInteractionSource()
+            ) {
+                onItemClick(product)
+            }
     ) {
-        val (productImage, productName, productDisc,productPrice, addButton) = createRefs()
+        val (productImage, productName, productDisc, productPrice, addButton) = createRefs()
 
         Image(
             painter = painterResource(id = imageResId),

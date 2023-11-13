@@ -1,14 +1,15 @@
 package com.example.quickmart.data.repository
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.data.db.entities.CartEntity
 import com.example.quickmart.models.CartItem
 
-class CartRepository(private val db: QuickMartDatabase) {
-    var cartItems by mutableStateOf(listOf<CartItem>())
+object CartRepository {
+    private lateinit var db: QuickMartDatabase
+
+    fun initDb(database: QuickMartDatabase) {
+        db = database
+    }
 
     suspend fun addItem(cartItem: CartItem) {
         val entity = CartEntity(
@@ -18,11 +19,11 @@ class CartRepository(private val db: QuickMartDatabase) {
             quantity = cartItem.quantity,
             unitPrice = cartItem.unitPrice
         )
-        db.getQuickMartDao().addItem(entity)
+        db.getQuickMartDao().addItemToCart(entity)
     }
 
     suspend fun updateItem(productId: String, quantity: Int) {
-        db.getQuickMartDao().updateItem(productId, quantity)
+        db.getQuickMartDao().updateItemInCart(productId, quantity)
     }
 
     suspend fun deleteItem(cartItem: CartItem) {
@@ -33,18 +34,15 @@ class CartRepository(private val db: QuickMartDatabase) {
             quantity = cartItem.quantity,
             unitPrice = cartItem.unitPrice
         )
-        db.getQuickMartDao().deleteItem(entity)
-        cartItems = cartItems.toMutableList().apply {
-            removeAll { it.productId == cartItem.productId }
-        }
+        db.getQuickMartDao().deleteItemFromCart(entity)
     }
 
     suspend fun getCartTotal(): Double {
         return db.getQuickMartDao().getCartTotal() ?: 0.00
     }
 
-    suspend fun getAllCartItems() {
-        cartItems = db.getQuickMartDao().getAllCartItems().map {
+    suspend fun getAllCartItems(): List<CartItem> {
+        return db.getQuickMartDao().getAllCartItems().map {
             CartItem(
                 productId = it.id,
                 productName = it.productName,

@@ -1,7 +1,8 @@
-package com.example.quickmart.ui.cart
+package com.example.quickmart.ui.favourites
 
-import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,16 +15,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.BottomCenter
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,15 +32,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.quickmart.ui.components.CartItemUi
+import com.example.quickmart.ui.components.FavouriteItemUi
 import com.example.quickmart.ui.theme.GreenColor
 import com.example.quickmart.ui.theme.H1Color
 
 @Composable
-fun CartScreen(viewModel: CartViewModel) {
-    val context = LocalContext.current
+fun FavouritesScreen(viewModel: FavouritesViewModel) {
     LaunchedEffect(true) {
-        viewModel.initView()
+        viewModel.loadItems()
+    }
+    val isFavouritesEmpty = remember {
+        derivedStateOf {
+            viewModel.favouritesItems.isEmpty()
+        }
+    }
+    val isButtonEnabled = remember {
+        derivedStateOf {
+            !isFavouritesEmpty.value
+        }
     }
     Box(
         modifier = Modifier
@@ -49,52 +58,48 @@ fun CartScreen(viewModel: CartViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .align(TopStart)
+                .align(Alignment.TopStart)
         ) {
             Text(
-                text = "My Cart",
+                text = "My Favourites",
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 color = H1Color,
                 modifier = Modifier
-                    .align(CenterHorizontally)
+                    .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
             )
             Divider(color = Color.Gray.copy(0.19f))
             Spacer(modifier = Modifier.height(10.dp))
             LazyColumn {
-                if (viewModel.cartItems.isEmpty()) {
+                if (viewModel.favouritesItems.isEmpty()) {
                     item {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            horizontalAlignment = CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.ShoppingCart,
+                                imageVector = Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
                                 tint = Color.Gray,
                                 modifier = Modifier.size(70.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Your cart is empty",
+                                text = "Your favourites is empty",
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontSize = 18.sp, color = Color.Gray)
                             )
                         }
                     }
                 } else {
-                    items(viewModel.cartItems) { cartItem ->
-                        CartItemUi(
-                            cartItem = cartItem,
+                    items(viewModel.favouritesItems) { favouriteItem ->
+                        FavouriteItemUi(
+                            favouriteItem = favouriteItem,
                             onDeleteIconClicked = {
-                                viewModel.deleteItem(cartItem)
-                                Toast.makeText(context, "Item removed", Toast.LENGTH_SHORT).show()
-                            },
-                            onPriceChange = { diff ->
-                                viewModel.totalPrice += diff
+                                viewModel.deleteItem(it)
                             }
                         )
                     }
@@ -103,38 +108,33 @@ fun CartScreen(viewModel: CartViewModel) {
                     }
                 }
             }
-
-
         }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 25.dp, vertical = 10.dp)
-                .background(GreenColor, RoundedCornerShape(15.dp))
-                .align(BottomCenter)
+                .background(
+                    if (isButtonEnabled.value) GreenColor else Color.Gray,
+                    shape = RoundedCornerShape(15.dp)
+                )
+                .align(Alignment.BottomCenter)
                 .size(width = 0.dp, height = 70.dp)
+                .clickable(
+                    indication = null,
+                    interactionSource = MutableInteractionSource(),
+                    enabled = isButtonEnabled.value
+                ) {
+                    viewModel.addAllItemsToCart()
+                }
         ) {
             Text(
                 modifier = Modifier
                     .align(Alignment.Center),
-                text = "Go To Checkout",
+                text = "Move All To Cart",
                 fontWeight = FontWeight.Bold,
                 fontSize = 22.sp,
                 color = Color.White,
             )
-            Text(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 10.dp)
-                    .background(Color.Black.copy(0.2f), RoundedCornerShape(5.dp))
-                    .padding(5.dp),
-                text = '$' + String.format("%.2f", viewModel.totalPrice),
-                color = Color.White,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-            )
-
         }
     }
 }
-

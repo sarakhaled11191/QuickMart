@@ -21,6 +21,7 @@ import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.models.Product
 import com.example.quickmart.ui.cart.CartScreen
 import com.example.quickmart.ui.cart.CartViewModel
+import com.example.quickmart.ui.cart.Checkout
 import com.example.quickmart.ui.favourites.FavouritesScreen
 import com.example.quickmart.ui.favourites.FavouritesViewModel
 import com.example.quickmart.ui.home.navigation.BottomBarDestination
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         NavigationBar {
                             val currentRoute = currentRoute(navController)
                             BottomBarDestination.values().forEach { destination ->
-                                if (destination != BottomBarDestination.Product) {
+                                if (destination != BottomBarDestination.Product && destination != BottomBarDestination.Checkout) {
                                     NavigationBarItem(
                                         selected = currentRoute == destination.route,
                                         onClick = {
@@ -83,7 +84,7 @@ class MainActivity : ComponentActivity() {
                             composable(BottomBarDestination.Cart.route) {
                                 val viewModel: CartViewModel by viewModels()
                                 viewModel.initDatabase(dataBase)
-                                CartScreen(viewModel)
+                                CartScreen(viewModel, navController)
                             }
                             composable(BottomBarDestination.Favourites.route) {
                                 val viewModel: FavouritesViewModel by viewModels()
@@ -100,6 +101,11 @@ class MainActivity : ComponentActivity() {
                                     viewModel.initDatabase(dataBase)
                                     viewModel.setProduct(product)
                                     ProductScreen(viewModel, navController)
+                                }
+                            }
+                            composable(BottomBarDestination.Checkout.route) {
+                                Checkout {
+                                    navController.navigate(BottomBarDestination.Shop.route)
                                 }
                             }
                         }

@@ -3,6 +3,7 @@ package com.example.quickmart.data.repository
 import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.data.db.entities.FavouriteEntity
 import com.example.quickmart.models.FavouriteItem
+import com.example.quickmart.utils.appUser
 
 object FavouritesRepository {
     private lateinit var db: QuickMartDatabase
@@ -13,31 +14,23 @@ object FavouritesRepository {
 
     suspend fun addItem(favouriteItem: FavouriteItem) {
         val entity = FavouriteEntity(
-            id = favouriteItem.productId,
-            productName = favouriteItem.productName,
-            productImage = favouriteItem.productImage,
-            unitPrice = favouriteItem.unitPrice
+            productId = favouriteItem.productId,
+            userId = appUser!!.id
         )
         db.getQuickMartDao().addItemToFavourite(entity)
     }
 
     suspend fun deleteItem(favouriteItem: FavouriteItem) {
-        val entity = FavouriteEntity(
-            id = favouriteItem.productId,
-            productName = favouriteItem.productName,
-            productImage = favouriteItem.productImage,
-            unitPrice = favouriteItem.unitPrice
-        )
-        db.getQuickMartDao().deleteItemFromFavourite(entity)
+        db.getQuickMartDao().deleteItemFromFavourite(favouriteItem.productId)
     }
 
     suspend fun getAllFavouritesItems(): List<FavouriteItem> {
         return db.getQuickMartDao().getAllFavouriteItems().map {
             FavouriteItem(
-                productId = it.id,
-                productName = it.productName,
-                productImage = it.productImage,
-                unitPrice = it.unitPrice
+                productId = it.productEntity.id,
+                productName = it.productEntity.title,
+                productImage = it.productEntity.imageName,
+                unitPrice = it.productEntity.price
             )
         }
     }

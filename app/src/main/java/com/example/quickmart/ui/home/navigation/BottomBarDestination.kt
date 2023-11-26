@@ -15,5 +15,6 @@ enum class BottomBarDestination(
     Cart(Icons.Outlined.ShoppingCart, "cart"),
     Favourites(Icons.Outlined.FavoriteBorder, "favourites"),
     Product(Icons.Outlined.Send, "product"),
+    Checkout(Icons.Outlined.Send, "checkout"),
 }
 

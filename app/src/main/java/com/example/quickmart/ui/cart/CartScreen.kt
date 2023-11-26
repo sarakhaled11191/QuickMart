@@ -2,6 +2,8 @@ package com.example.quickmart.ui.cart
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,12 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.quickmart.ui.components.CartItemUi
+import com.example.quickmart.ui.home.navigation.BottomBarDestination
 import com.example.quickmart.ui.theme.GreenColor
 import com.example.quickmart.ui.theme.H1Color
 
 @Composable
-fun CartScreen(viewModel: CartViewModel) {
+fun CartScreen(viewModel: CartViewModel, navController: NavHostController) {
     val context = LocalContext.current
     LaunchedEffect(true) {
         viewModel.initView()
@@ -112,6 +116,13 @@ fun CartScreen(viewModel: CartViewModel) {
                 .padding(horizontal = 25.dp, vertical = 10.dp)
                 .background(GreenColor, RoundedCornerShape(15.dp))
                 .align(BottomCenter)
+                .clickable(
+                    indication = null,
+                    interactionSource = MutableInteractionSource(),
+                ) {
+                    viewModel.clearCart()
+                    navController.navigate(BottomBarDestination.Checkout.route)
+                }
                 .size(width = 0.dp, height = 70.dp)
         ) {
             Text(

@@ -32,8 +32,8 @@ import com.example.quickmart.ui.theme.GrayColor
 fun ProductsScreen(viewModel: ProductsViewModel, navController: NavHostController) {
     val context = LocalContext.current
     LaunchedEffect(true) {
-        viewModel.loadProducts(context)
-        viewModel.loadCategories(context)
+        viewModel.loadProducts()
+        viewModel.loadCategories()
     }
     Column(
         modifier = Modifier

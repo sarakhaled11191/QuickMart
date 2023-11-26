@@ -1,6 +1,7 @@
 package com.example.quickmart.ui.products
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,22 +28,29 @@ class ProductsViewModel : ViewModel() {
     fun initDatabase(db: QuickMartDatabase) {
         cartRepository.initDb(db)
         favouritesRepository.initDb(db)
+        productRepository.initDb(db)
     }
 
-    fun loadProducts(context: Context) {
-        productRepository.initProducts(context)
-        productsList = productRepository.originalProductList
+    fun loadProducts() {
+        viewModelScope.launch {
+            productsList = productRepository.getProducts()
+        }
     }
 
-    fun loadCategories(context: Context) {
-        productsCategory = productRepository.getProductCategories(context)
+    fun loadCategories() {
+        viewModelScope.launch {
+            productsCategory = productRepository.getCategoriesFromDb()
+        }
     }
 
     fun getProducts() {
-        productsList = ProductRepository.getProducts(
-            searchQuery,
-            selectedCategory
-        )
+        viewModelScope.launch {
+            productsList = ProductRepository.getProducts(
+                searchQuery,
+                selectedCategory
+            )
+
+        }
     }
 
     fun addItemToCart(product: Product) {

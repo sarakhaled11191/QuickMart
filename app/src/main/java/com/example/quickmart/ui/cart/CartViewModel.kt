@@ -19,18 +19,24 @@ class CartViewModel : ViewModel() {
         cartRepository.initDb(db)
     }
 
-    fun initView(){
+    fun initView() {
         viewModelScope.launch {
             cartItems = cartRepository.getAllCartItems()
             totalPrice = cartRepository.getCartTotal()
         }
     }
 
-    fun deleteItem(cartItem: CartItem){
+    fun deleteItem(cartItem: CartItem) {
         viewModelScope.launch {
             cartRepository.deleteItem(cartItem)
             cartItems = cartItems.filter { it.productId != cartItem.productId }
             totalPrice -= (cartItem.unitPrice * cartItem.quantity)
+        }
+    }
+
+    fun clearCart() {
+        viewModelScope.launch {
+            cartRepository.clearCart()
         }
     }
 }

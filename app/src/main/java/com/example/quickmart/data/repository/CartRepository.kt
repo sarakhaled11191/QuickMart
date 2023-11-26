@@ -1,8 +1,10 @@
 package com.example.quickmart.data.repository
 
+import android.util.Log
 import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.data.db.entities.CartEntity
 import com.example.quickmart.models.CartItem
+import com.example.quickmart.utils.appUser
 
 object CartRepository {
     private lateinit var db: QuickMartDatabase
@@ -13,11 +15,9 @@ object CartRepository {
 
     suspend fun addItem(cartItem: CartItem) {
         val entity = CartEntity(
-            id = cartItem.productId,
-            productName = cartItem.productName,
-            productImage = cartItem.productImage,
+            productId = cartItem.productId,
             quantity = cartItem.quantity,
-            unitPrice = cartItem.unitPrice
+            userId = appUser!!.id
         )
         db.getQuickMartDao().addItemToCart(entity)
     }
@@ -27,14 +27,7 @@ object CartRepository {
     }
 
     suspend fun deleteItem(cartItem: CartItem) {
-        val entity = CartEntity(
-            id = cartItem.productId,
-            productName = cartItem.productName,
-            productImage = cartItem.productImage,
-            quantity = cartItem.quantity,
-            unitPrice = cartItem.unitPrice
-        )
-        db.getQuickMartDao().deleteItemFromCart(entity)
+        db.getQuickMartDao().deleteItemFromCart(cartItem.productId)
     }
 
     suspend fun getCartTotal(): Double {
@@ -44,12 +37,16 @@ object CartRepository {
     suspend fun getAllCartItems(): List<CartItem> {
         return db.getQuickMartDao().getAllCartItems().map {
             CartItem(
-                productId = it.id,
-                productName = it.productName,
-                productImage = it.productImage,
-                quantity = it.quantity,
-                unitPrice = it.unitPrice
+                productId = it.cartEntity.productId,
+                productName = it.productEntity.title,
+                productImage = it.productEntity.imageName,
+                quantity = it.cartEntity.quantity,
+                unitPrice = it.productEntity.price
             )
         }
+    }
+
+    suspend fun clearCart(){
+        db.getQuickMartDao().clearCart()
     }
 }

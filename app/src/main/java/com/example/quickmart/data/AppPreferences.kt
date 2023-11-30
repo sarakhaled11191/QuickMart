@@ -8,11 +8,11 @@ class AppPreferences(context: Context) {
     private val preferences: SharedPreferences =
         context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
-    fun isDatabaseSeeded(): Boolean {
-        return preferences.getBoolean("isDatabaseSeeded", false)
+    fun isLoggedIn(): Boolean {
+        return preferences.getBoolean("isLoggedIn", false)
     }
 
-    fun setDatabaseSeeded() {
-        preferences.edit().putBoolean("isDatabaseSeeded", true).apply()
+    fun setLoggedIn() {
+        preferences.edit().putBoolean("isLoggedIn", true).apply()
     }
 }

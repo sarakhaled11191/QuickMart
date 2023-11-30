@@ -1,7 +1,5 @@
 package com.example.quickmart.ui.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,39 +18,30 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.quickmart.data.db.QuickMartDatabase
-import com.example.quickmart.data.repository.CartRepository
+import coil.compose.AsyncImage
 import com.example.quickmart.models.CartItem
 import com.example.quickmart.ui.theme.H1Color
-import kotlinx.coroutines.launch
 
 @Composable
 fun CartItemUi(
     cartItem: CartItem,
     onDeleteIconClicked: (CartItem) -> Unit,
-    onPriceChange: (Double) -> Unit
+    onPriceChange: (Double) -> Unit,
+    updateCartQuantity: (Int) -> Unit
 ) {
-    val dataBase = QuickMartDatabase(LocalContext.current)
-    val repository = CartRepository
-    repository.initDb(dataBase)
-    val coroutineScope = rememberCoroutineScope()
-    var previousTotalPrice = 0.0
     var totalPrice by remember { mutableDoubleStateOf(cartItem.calculateTotalPrice()) }
-    val resources = LocalContext.current.resources
-    val packageName = LocalContext.current.packageName
-    val imageResId = resources.getIdentifier(cartItem.productImage, "drawable", packageName)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,8 +56,8 @@ fun CartItemUi(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Image(
-                    painter = painterResource(id = imageResId),
+                AsyncImage(
+                    model = cartItem.productImage,
                     contentDescription = "productImage",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -114,32 +103,20 @@ fun CartItemUi(
                             onPlusButtonClicked = {
                                 val previousPrice = cartItem.calculateTotalPrice()
                                 cartItem.quantity += 1
-                                coroutineScope.launch {
-                                    repository.updateItem(
-                                        cartItem.productId,
-                                        cartItem.quantity
-                                    )
-                                }
+                                updateCartQuantity(cartItem.quantity)
                                 totalPrice = cartItem.calculateTotalPrice()
                                 val newPrice = cartItem.calculateTotalPrice()
                                 val priceDifference = newPrice - previousPrice
                                 onPriceChange(priceDifference)
-                                previousTotalPrice = newPrice
                             },
                             onMiensButtonClicked = {
                                 val previousPrice = cartItem.calculateTotalPrice()
                                 cartItem.quantity -= 1
-                                coroutineScope.launch {
-                                    repository.updateItem(
-                                        cartItem.productId,
-                                        cartItem.quantity
-                                    )
-                                }
+                                updateCartQuantity(cartItem.quantity)
                                 totalPrice = cartItem.calculateTotalPrice()
                                 val newPrice = cartItem.calculateTotalPrice()
                                 val priceDifference = newPrice - previousPrice
                                 onPriceChange(priceDifference)
-                                previousTotalPrice = newPrice
                             }
                         )
                         Text(

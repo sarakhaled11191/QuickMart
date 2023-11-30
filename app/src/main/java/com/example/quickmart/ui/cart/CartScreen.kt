@@ -99,6 +99,9 @@ fun CartScreen(viewModel: CartViewModel, navController: NavHostController) {
                             },
                             onPriceChange = { diff ->
                                 viewModel.totalPrice += diff
+                            },
+                            updateCartQuantity = {
+                                viewModel.updateItem(cartItem.productId, it)
                             }
                         )
                     }

@@ -17,10 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.quickmart.models.Category
 
 @Composable
 fun DropDownMenu(
-    items: List<String>,
+    items: List<Category>,
     onItemClick: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -40,9 +41,9 @@ fun DropDownMenu(
         ) {
             items.forEach {
                 DropdownMenuItem(
-                    text = { Text(it) },
+                    text = { Text(it.category) },
                     onClick = {
-                        onItemClick(it)
+                        onItemClick(it.id)
                         expanded = false
                     }
                 )

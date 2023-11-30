@@ -1,51 +1,52 @@
 package com.example.quickmart.ui.products
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.data.repository.CartRepository
-import com.example.quickmart.data.repository.FavouritesRepository
 import com.example.quickmart.data.repository.ProductRepository
 import com.example.quickmart.models.CartItem
+import com.example.quickmart.models.Category
 import com.example.quickmart.models.Product
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ProductsViewModel : ViewModel() {
-    private val productRepository = ProductRepository
-    private val cartRepository = CartRepository
-    private val favouritesRepository = FavouritesRepository
+    private var productsRegistration: ListenerRegistration? = null
+    private var categoriesRegistration: ListenerRegistration? = null
     var searchQuery by mutableStateOf("")
-    var selectedCategory by mutableStateOf("All")
-    var productsCategory by mutableStateOf(listOf<String>())
+    var selectedCategory by mutableStateOf("fMnacTlx7mNYzw6wcJhW")
+    var productsCategory by mutableStateOf(listOf<Category>())
     var productsList by mutableStateOf(listOf<Product>())
 
-    fun initDatabase(db: QuickMartDatabase) {
-        cartRepository.initDb(db)
-        favouritesRepository.initDb(db)
-        productRepository.initDb(db)
+    init {
+        initProducts()
+        initCategories()
     }
 
-    fun loadProducts() {
-        viewModelScope.launch {
-            productsList = productRepository.getProducts()
+    override fun onCleared() {
+        productsRegistration?.remove()
+        categoriesRegistration?.remove()
+        super.onCleared()
+    }
+
+    private fun initProducts() {
+        productsRegistration = ProductRepository.getProducts { updatedProducts ->
+            productsList = updatedProducts
         }
     }
 
-    fun loadCategories() {
-        viewModelScope.launch {
-            productsCategory = productRepository.getCategoriesFromDb()
+    private fun initCategories() {
+        categoriesRegistration = ProductRepository.getCategories { updatedCategories ->
+            productsCategory = updatedCategories
         }
     }
 
-    fun getProducts() {
+    fun searchForProduct() {
         viewModelScope.launch {
-            productsList = ProductRepository.getProducts(
+            productsList = ProductRepository.searchForProduct(
                 searchQuery,
                 selectedCategory
             )
@@ -58,19 +59,11 @@ class ProductsViewModel : ViewModel() {
             val mapper = CartItem(
                 productId = product.id,
                 productName = product.title,
-                productImage = product.imageName,
+                productImage = product.imageUrl,
                 quantity = 1,
                 unitPrice = product.price
             )
-            cartRepository.addItem(mapper)
+            CartRepository.addItem(mapper)
         }
-    }
-
-    fun isItemInFavourite(id: String): Boolean {
-        var isFavourite: Boolean
-        runBlocking {
-            isFavourite = favouritesRepository.isInFavourite(id)
-        }
-        return isFavourite
     }
 }

@@ -7,40 +7,42 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.quickmart.data.db.QuickMartDatabase
 import com.example.quickmart.data.repository.CartRepository
 import com.example.quickmart.data.repository.FavouritesRepository
+import com.example.quickmart.data.repository.ProductRepository
 import com.example.quickmart.models.CartItem
 import com.example.quickmart.models.FavouriteItem
 import com.example.quickmart.models.Product
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 
 class ProductViewModel : ViewModel() {
-    private val cartRepository = CartRepository
-    private val favouriteRepository = FavouritesRepository
+    private var productRegistration: ListenerRegistration? = null
     var currentProduct by mutableStateOf<Product?>(null)
     var totalPrice by mutableDoubleStateOf(currentProduct?.price ?: 0.0)
-    var isInFavourites by mutableStateOf(currentProduct?.isInFavourites)
+    var isInFavourites by mutableStateOf(false)
     var quantity by mutableIntStateOf(1)
 
-    fun initDatabase(db: QuickMartDatabase) {
-        cartRepository.initDb(db)
-        favouriteRepository.initDb(db)
+    override fun onCleared() {
+        productRegistration?.remove()
+        super.onCleared()
     }
 
-    fun setProduct(productP: Product) {
-        currentProduct = productP
-        totalPrice = currentProduct!!.price
-        isInFavourites = currentProduct!!.isInFavourites
+    fun getItem(productId: String) {
+        productRegistration = ProductRepository.getProductById(productId) { updatedProduct ->
+            currentProduct = updatedProduct
+            totalPrice = updatedProduct!!.price * quantity
+            isInFavourites = updatedProduct.isInFavourites
+        }
     }
 
     fun addItemToBasket() {
         viewModelScope.launch {
-            cartRepository.addItem(
+            CartRepository.addItem(
                 CartItem(
                     productId = currentProduct!!.id,
                     productName = currentProduct!!.title,
-                    productImage = currentProduct!!.imageName,
+                    productImage = currentProduct!!.imageUrl,
                     unitPrice = currentProduct!!.price,
                     quantity = quantity
                 )
@@ -51,11 +53,11 @@ class ProductViewModel : ViewModel() {
 
     fun addItemToFavourite() {
         viewModelScope.launch {
-            favouriteRepository.addItem(
+            FavouritesRepository.addItem(
                 FavouriteItem(
                     productId = currentProduct!!.id,
                     productName = currentProduct!!.title,
-                    productImage = currentProduct!!.imageName,
+                    productImage = currentProduct!!.imageUrl,
                     unitPrice = currentProduct!!.price,
                 )
             )
@@ -64,11 +66,11 @@ class ProductViewModel : ViewModel() {
 
     fun deleteItemFromFavourite() {
         viewModelScope.launch {
-            favouriteRepository.deleteItem(
+            FavouritesRepository.deleteItem(
                 FavouriteItem(
                     productId = currentProduct!!.id,
                     productName = currentProduct!!.title,
-                    productImage = currentProduct!!.imageName,
+                    productImage = currentProduct!!.imageUrl,
                     unitPrice = currentProduct!!.price,
                 )
             )

@@ -1,6 +1,5 @@
 package com.example.quickmart.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,11 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.quickmart.models.FavouriteItem
 import com.example.quickmart.ui.theme.H1Color
 
@@ -37,9 +35,6 @@ fun FavouriteItemUi(
     favouriteItem: FavouriteItem,
     onDeleteIconClicked: (FavouriteItem) -> Unit,
 ) {
-    val resources = LocalContext.current.resources
-    val packageName = LocalContext.current.packageName
-    val imageResId = resources.getIdentifier(favouriteItem.productImage, "drawable", packageName)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,8 +49,8 @@ fun FavouriteItemUi(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Image(
-                    painter = painterResource(id = imageResId),
+                AsyncImage(
+                    model = favouriteItem.productImage,
                     contentDescription = "productImage",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

@@ -13,23 +13,17 @@ import com.example.quickmart.models.FavouriteItem
 import kotlinx.coroutines.launch
 
 class FavouritesViewModel : ViewModel() {
-    private val favouritesRepository = FavouritesRepository
-    private val cartRepository = CartRepository
     var favouritesItems by mutableStateOf(listOf<FavouriteItem>())
-    fun initDatabase(db: QuickMartDatabase) {
-        favouritesRepository.initDb(db)
-        cartRepository.initDb(db)
-    }
 
     fun loadItems() {
         viewModelScope.launch {
-            favouritesItems = favouritesRepository.getAllFavouritesItems()
+            favouritesItems = FavouritesRepository.getAllFavouritesItems()
         }
     }
 
     fun deleteItem(favouriteItem: FavouriteItem) {
         viewModelScope.launch {
-            favouritesRepository.deleteItem(favouriteItem)
+            FavouritesRepository.deleteItem(favouriteItem)
             favouritesItems = favouritesItems.filter { it.productId != favouriteItem.productId }
         }
     }
@@ -37,7 +31,7 @@ class FavouritesViewModel : ViewModel() {
     fun addAllItemsToCart() {
         viewModelScope.launch {
             favouritesItems.map {
-                cartRepository.addItem(
+                CartRepository.addItem(
                     CartItem(
                         productId = it.productId,
                         productName = it.productName,
@@ -46,7 +40,7 @@ class FavouritesViewModel : ViewModel() {
                         unitPrice = it.unitPrice
                     )
                 )
-                favouritesRepository.deleteItem(it)
+                FavouritesRepository.deleteItem(it)
             }
             favouritesItems = emptyList()
         }

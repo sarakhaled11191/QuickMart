@@ -76,8 +76,8 @@ interface QuickMartDao {
     suspend fun addUser(userEntity: UserEntity)
 
     @Query("SELECT * FROM users LIMIT 1")
-    suspend fun getUser(): UserEntity
+    suspend fun getUser(): UserEntity?
 
-    @Query("DELETE FROM users WHERE id = :userId")
-    suspend fun deleteUserById(userId: String)
+    @Query("DELETE FROM users")
+    suspend fun deleteUser()
 }

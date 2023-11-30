@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization") version "1.8.10"
     id ("kotlin-kapt")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -89,5 +90,13 @@ dependencies {
     annotationProcessor ("androidx.room:room-compiler:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // coil
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
 }

@@ -2,7 +2,6 @@ package com.example.quickmart.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -28,44 +27,41 @@ fun SearchBarWithClearIcon(
     onTextChange: (String) -> Unit
 ) {
     val textFieldState = remember { mutableStateOf(TextFieldValue()) }
-
-
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null,
-                    tint = H1Color,
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                BasicTextField(
-                    value = textFieldState.value,
-                    onValueChange = {
-                        textFieldState.value = it
-                        onTextChange(it.text)
-                    },
-                    textStyle = TextStyle(fontSize = 20.sp)
-                )
-            }
-
-            if (textFieldState.value.text.isNotEmpty()) {
-                Icon(
-                    imageVector = Icons.Outlined.Clear,
-                    contentDescription = null,
-                    tint = H1Color,
-                    modifier = Modifier
-                        .clickable {
-                            textFieldState.value = TextFieldValue()
-                            onTextChange("")
-                        }
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.Search,
+                contentDescription = null,
+                tint = H1Color,
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            BasicTextField(
+                value = textFieldState.value,
+                onValueChange = {
+                    textFieldState.value = it
+                    onTextChange(it.text)
+                },
+                textStyle = TextStyle(fontSize = 20.sp)
+            )
         }
 
+        if (textFieldState.value.text.isNotEmpty()) {
+            Icon(
+                imageVector = Icons.Outlined.Clear,
+                contentDescription = null,
+                tint = H1Color,
+                modifier = Modifier
+                    .clickable {
+                        textFieldState.value = TextFieldValue()
+                        onTextChange("")
+                    }
+            )
+        }
+    }
 }

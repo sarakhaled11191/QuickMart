@@ -1,6 +1,5 @@
 package com.example.quickmart.ui.products
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,10 +29,6 @@ import com.example.quickmart.ui.theme.GrayColor
 @Composable
 fun ProductsScreen(viewModel: ProductsViewModel, navController: NavHostController) {
     val context = LocalContext.current
-    LaunchedEffect(true) {
-        viewModel.loadProducts()
-        viewModel.loadCategories()
-    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,13 +47,13 @@ fun ProductsScreen(viewModel: ProductsViewModel, navController: NavHostControlle
                     .weight(1f)
             ) {
                 viewModel.searchQuery = it
-                viewModel.getProducts()
+                viewModel.searchForProduct()
             }
             DropDownMenu(
                 viewModel.productsCategory
             ) {
                 viewModel.selectedCategory = it
-                viewModel.getProducts()
+                viewModel.searchForProduct()
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -77,15 +71,7 @@ fun ProductsScreen(viewModel: ProductsViewModel, navController: NavHostControlle
                             Toast.makeText(context, "Item Added", Toast.LENGTH_SHORT).show()
                         },
                         onItemClick = {
-                            val isInFavourite = viewModel.isItemInFavourite(it.id)
-                            Log.e("test", isInFavourite.toString())
-                            val product = it
-                            product.isInFavourites = isInFavourite
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                "Product",
-                                it
-                            )
-                            navController.navigate(BottomBarDestination.Product.route)
+                            navController.navigate("${BottomBarDestination.Product.route}/${it.id}")
                         }
                     )
                 }

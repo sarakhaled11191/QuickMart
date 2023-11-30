@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.quickmart.ui.components.CounterView
 import com.example.quickmart.ui.theme.GreenColor
 import com.example.quickmart.ui.theme.H1Color
@@ -54,9 +55,6 @@ import com.example.quickmart.ui.theme.StarColor
 @Composable
 fun ProductScreen(viewModel: ProductViewModel, navController: NavHostController) {
     val context = LocalContext.current
-    val resources = LocalContext.current.resources
-    val packageName = LocalContext.current.packageName
-    val imageResId = resources.getIdentifier(viewModel.currentProduct?.imageName, "drawable", packageName)
     var expanded by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
@@ -71,8 +69,8 @@ fun ProductScreen(viewModel: ProductViewModel, navController: NavHostController)
                 modifier = Modifier
                     .fillMaxHeight(0.3f)
             ) {
-                Image(
-                    painter = painterResource(id = imageResId),
+                AsyncImage(
+                    model = viewModel.currentProduct?.imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -120,7 +118,7 @@ fun ProductScreen(viewModel: ProductViewModel, navController: NavHostController)
                         fontSize = 22.sp,
                     )
                 }
-                if(viewModel.isInFavourites == true){
+                if(viewModel.isInFavourites){
                     Icon(
                         imageVector = Icons.Filled.Favorite,
                         contentDescription = "delete item",
